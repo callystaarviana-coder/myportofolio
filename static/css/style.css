@@ -5,17 +5,17 @@
 }
 
 :root {
-  /* Skema Warna Baru: Ungu Muda & Biru Muda */
-  --bg-main: #f5f3ff;        /* Latar belakang utama: Ungu pastel sangat lembut */
-  --paper: #ffffff;          /* Latar belakang kartu: Putih bersih */
-  --ink: #2e1065;            /* Warna teks utama: Ungu gelap (supaya mudah dibaca & ramah mata) */
-  --text-muted: #5b21b6;     /* Warna teks sekunder: Ungu sedang */
-  --line: #ddd6fe;           /* Warna garis pembatas: Ungu muda lembut */
+  /* Ungu Muda & Biru Muda */
+  --bg-main: #f5f3ff;        
+  --paper: #ffffff;          
+  --ink: #2e1065;            
+  --text-muted: #5b21b6;     
+  --line: #ddd6fe;           
   
   /* Aksesori & Accent */
-  --accent: #a78bfa;         /* Ungu muda cerah (Lavender) */
-  --accent-blue: #bae6fd;    /* Biru muda lembut (Baby Blue) */
-  --accent-dark: #6d28d9;    /* Ungu tua untuk highlight teks/tag */
+  --accent: #a78bfa;         
+  --accent-blue: #bae6fd;    
+  --accent-dark: #6d28d9;    
   
   --radius: 12px;
 }
@@ -201,9 +201,7 @@ h1, .brand {
     }
 }
 
-/* ==========================================
-   Education Section Styles (Purple & Blue Theme)
-   ========================================== */
+/* Education Section */
 .education {
   padding: 4rem 0;
   border-top: 2px dashed var(--line);
@@ -219,7 +217,7 @@ h1, .brand {
   gap: 0.5rem;
 }
 
-/* Aksesori garis biru muda di samping judul */
+
 .section-title::before {
   content: "";
   display: inline-block;
@@ -235,7 +233,6 @@ h1, .brand {
   gap: 1.5rem;
 }
 
-/* Kartu Pendidikan dengan Gradasi & Animasi Transition */
 .education-card {
   background: linear-gradient(135deg, #ffffff 0%, #f4f0ff 100%);
   border: 2px solid var(--line);
@@ -249,7 +246,7 @@ h1, .brand {
   overflow: hidden;
 }
 
-/* Efek Hover Kartu Terangkat & Bayangan Soft */
+
 .education-card:hover {
   transform: translateY(-6px);
   border-color: var(--accent);
@@ -293,7 +290,7 @@ h1, .brand {
   flex-wrap: wrap;
 }
 
-/* Tag Kapsul Warna Biru Muda */
+
 .education-tags span {
   font-size: 0.75rem;
   font-weight: 600;
@@ -302,4 +299,86 @@ h1, .brand {
   border: 1px solid #7dd3fc;
   padding: 0.25rem 0.65rem;
   border-radius: 20px;
+}
+
+/* extra decoration  */
+
+.hero {
+    position: relative;
+}
+
+.hero::before {
+    content: "✦";
+    position: absolute;
+    top: 25px;
+    left: 5%;
+    font-size: 1.5rem;
+    color: var(--accent);
+}
+
+.hero::after {
+    content: "✧";
+    position: absolute;
+    top: 60px;
+    right: 8%;
+    font-size: 2rem;
+    color: var(--accent-blue);
+    animation: float 3s ease-in-out infinite;
+}
+
+.hero-photo {
+    position: relative;
+}
+
+.hero-photo::after {
+    content: "♡";
+    position: absolute;
+    bottom: -18px;
+    left: -18px;
+    font-size: 2.2rem;
+    color: var(--accent);
+    z-index: 3;
+}
+
+
+.education {
+    position: relative;
+}
+
+.education::after {
+    content: "✿";
+    position: absolute;
+    right: 5%;
+    top: 25px;
+    font-size: 1.7rem;
+    color: var(--accent);
+}
+
+.education-card {
+    position: relative;
+}
+
+.education-card::before {
+    content: "•";
+    position: absolute;
+    top: 10px;
+    right: 18px;
+    font-size: 2rem;
+    color: var(--accent-blue);
+}
+
+
+.education-card:hover {
+    transform: translateY(-6px) rotate(-0.5deg);
+}
+
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-6px);
+    }
 }
