@@ -75,17 +75,38 @@
                 </div>
 
                 <!-- Soft Skills -->
+                                <!-- Soft Skills (Floating Pill Capsule) -->
                 <h2 class="skills-subheading">Soft Skills</h2>
                 <div class="soft-skills-grid">
                     {% for skill in skill_list %}
                         {% if skill.category == 'soft_skill' %}
-                            <article class="soft-skill-card">
-                                <h3>{{ skill.name }}</h3>
-                                <span class="diamond-badge">{{ skill.get_proficiency_display }}</span>
-                                <p class="diamond-duration">
-                                    {{ skill.year_started }} – {% if skill.is_ongoing %}Now{% else %}{{ skill.year_ended }}{% endif %}
-                                </p>
-                            </article>
+                            <div class="pill-card">
+                                <div class="pill-icon">
+                                    {% if "Japanese" in skill.name %}
+                                        🇯🇵
+                                    {% elif "Chinese" in skill.name %}
+                                        🇨🇳
+                                    {% elif "English" in skill.name %}
+                                        🇬🇧
+                                    {% elif "Indonesian" in skill.name or "Indonesia" in skill.name %}
+                                        🇮🇩
+                                    {% elif "Problem" in skill.name %}
+                                        🧩
+                                    {% elif "Communication" in skill.name %}
+                                        💬
+                                    {% elif "Leadership" in skill.name or "Leader" in skill.name %}
+                                        👥
+                                    {% else %}
+                                        🌸
+                                    {% endif %}
+                                </div>
+                                <div class="pill-text">
+                                    <p class="pill-title">{{ skill.name }}</p>
+                                    <p class="pill-meta">
+                                        {{ skill.get_proficiency_display }} · {{ skill.year_started }}–{% if skill.is_ongoing %}Now{% else %}{{ skill.year_ended }}{% endif %}
+                                    </p>
+                                </div>
+                            </div>
                         {% endif %}
                     {% endfor %}
                 </div>
