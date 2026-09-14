@@ -5,7 +5,6 @@
 }
 
 :root {
-  /* Ungu Muda & Biru Muda */
   --bg-main: #f5f3ff;        
   --paper: #ffffff;          
   --ink: #2e1065;            
@@ -438,9 +437,6 @@ h1, .brand {
 }
 
 /* skills */
-/* =========================================
-   SKILLS SECTION STYLES
-   ========================================= */
 
 .skills-section {
     padding: 4rem 0;
@@ -454,7 +450,6 @@ h1, .brand {
     color: var(--text-dark, #1e293b);
 }
 
-/* Susunan horizontal memanjang ke samping */
 .diamond-grid {
     display: flex;
     flex-direction: row;
@@ -464,7 +459,6 @@ h1, .brand {
     padding: 1.5rem 0.5rem;
 }
 
-/* Tiap item skill */
 .diamond-item {
     display: flex;
     flex-direction: column;
@@ -473,14 +467,13 @@ h1, .brand {
     text-align: center;
 }
 
-/* Bentuk Belah Ketupat (Diamond) */
-/* Bentuk Belah Ketupat (Diamond) */
+/* Diamond */
 .diamond-shape {
     width: 90px;
     height: 90px;
     margin: 18px auto 24px auto;
     background: linear-gradient(-45deg, #7dd3fc 0%, #a5b4fc 45%, #fbcfe8 80%, #fce7f3 100%);
-    /* Border warna biru medium (tegas dan tidak terlalu gelap) */
+    
     border: 2.5px solid #2563eb;
     border-radius: 10px;
     transform: rotate(45deg);
@@ -495,25 +488,23 @@ h1, .brand {
                 border-color 0.3s ease;
 }
 
-/* Efek Nudge saat di-hover: Diamond terangkat */
+/* Nudge */
 .diamond-shape:hover {
     transform: rotate(45deg) translateY(-8px) scale(1.08);
-    border-color: #1d4ed8; /* Biru sedikit lebih tajam saat disentuh */
+    border-color: #1d4ed8; 
     box-shadow: 0 12px 28px rgba(37, 99, 235, 0.35);
 }
 
-/* Ikon di dalam: Saat DIAM -> TEGAK LURUS */
 .diamond-content {
-    transform: rotate(-45deg); /* Memutar balik 45 derajat agar ikon tegak lurus */
+    transform: rotate(-45deg); 
     display: flex;
     align-items: center;
     justify-content: center;
     transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* Ikon saat di-hover: BARU JADI MIRING & MEMBESAR */
 .diamond-shape:hover .diamond-content {
-    transform: rotate(-30deg) scale(1.15); /* Menjadi miring 15 derajat ke kanan */
+    transform: rotate(-30deg) scale(1.15); 
 }
 
 /* Ukuran Ikon */
@@ -533,7 +524,7 @@ h1, .brand {
     font-size: 2.4rem;
 }
 
-/* Keterangan di Luar Diamond */
+
 .diamond-info {
     display: flex;
     flex-direction: column;
@@ -549,7 +540,7 @@ h1, .brand {
     color: var(--text-dark, #0f172a);
 }
 
-/* Badge level proficiency */
+
 .diamond-badge {
     display: inline-block;
     padding: 0.2rem 0.65rem;
@@ -567,8 +558,7 @@ h1, .brand {
     margin: 0;
 }
 
-/*
-   SOFT SKILLS*/
+/* soft skills*/
 
 .soft-skills-grid {
     display: flex;
@@ -579,35 +569,31 @@ h1, .brand {
     padding: 1rem 0;
 }
 
-/* Kartu Kapsul: Ujung Setengah Lingkaran Sempurna, Thin & Floating */
+
 .pill-card {
     display: inline-flex;
     flex-direction: row;
     align-items: center;
     gap: 0.85rem;
-    /* Ultra Soft Pink yang sangat lembut */
     background-color: #fff1f5;
-    /* Border Pink Tua yang tegas dan cantik */
     border: 2px solid #db2777;
-    /* 9999px membuat kedua ujungnya setengah lingkaran bulat murni */
     border-radius: 9999px;
-    padding: 0.6rem 1.4rem; /* Ramping (thin) */
+    padding: 0.6rem 1.4rem; 
     box-shadow: 0 4px 14px rgba(219, 39, 119, 0.12);
     cursor: pointer;
-    /* Transisi Floating Nudge yang halus */
     transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), 
                 box-shadow 0.3s ease, 
                 border-color 0.3s ease;
 }
 
-/* Efek Nudge saat di-hover: Kapsul terangkat ke atas dan bayangan membal */
+
 .pill-card:hover {
     transform: translateY(-6px) scale(1.05);
     border-color: #be185d;
     box-shadow: 0 10px 24px rgba(219, 39, 119, 0.28);
 }
 
-/* Ikon di dalam kapsul */
+
 .pill-icon {
     font-size: 1.5rem;
     display: flex;
@@ -617,10 +603,9 @@ h1, .brand {
 }
 
 .pill-card:hover .pill-icon {
-    transform: scale(1.2) rotate(10deg); /* Ikon membal miring lucu saat di-nudge */
+    transform: scale(1.2) rotate(10deg); 
 }
 
-/* Teks di dalam kapsul */
 .pill-text {
     display: flex;
     flex-direction: column;
@@ -630,7 +615,7 @@ h1, .brand {
 .pill-title {
     font-size: 0.95rem;
     font-weight: 700;
-    color: #831843; /* Teks warna plum/pink tua senada */
+    color: #831843; 
     margin: 0;
     line-height: 1.2;
 }

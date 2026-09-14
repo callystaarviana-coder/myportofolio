@@ -31,83 +31,77 @@
                 <p class="section-kicker">Kemampuan yang saya miliki</p>
                 <h1>Skills</h1>
 
-                <!-- Technical Skills -->
+                               <!-- Technical Skills -->
                 <h2 class="skills-subheading">Technical Skills</h2>
                 <div class="diamond-grid">
-                    {% for skill in skill_list %}
-                        {% if skill.category == 'technical' %}
-                            <div class="diamond-item">
-                                <!-- Kotak Diamond dengan efek Nudge -->
-                                <div class="diamond-shape">
-                                    <div class="diamond-content">
-                                        {% if skill.name == "Python" %}
-                                            <i class="devicon-python-plain colored"></i>
-                                        {% elif skill.name == "Java" %}
-                                            <i class="devicon-java-plain colored"></i>
-                                        {% elif skill.name == "HTML" %}
-                                            <i class="devicon-html5-plain colored"></i>
-                                        {% elif skill.name == "Canva" %}
-                                            <i class="devicon-canva-original colored"></i>
-                                        {% elif skill.name == "CapCut" %}
-                                            <!-- SVG CapCut logo resmi dan jernih -->
-                                            <svg class="custom-icon" viewBox="0 0 24 24" fill="currentColor">
-                                                <path d="M19.34 3.7a1 1 0 0 0-1.4 0l-5.94 5.95-5.94-5.95a1 1 0 0 0-1.41 1.42l6.65 6.65a1 1 0 0 0 1.41 0l6.64-6.65a1 1 0 0 0 0-1.42zM4.66 20.3a1 1 0 0 0 1.4 0l5.94-5.95 5.94 5.95a1 1 0 0 0 1.41-1.42l-6.65-6.65a1 1 0 0 0-1.41 0l-6.64 6.65a1 1 0 0 0 0 1.42z"/>
-                                            </svg>
-                                        {% else %}
-                                            <span class="icon-fallback">⚡</span>
-                                        {% endif %}
-                                    </div>
-                                </div>
-
-                                <!-- Keterangan di LUAR diamond (di bawahnya) -->
-                                <div class="diamond-info">
-                                    <h3 class="diamond-title">{{ skill.name }}</h3>
-                                    <span class="diamond-badge">{{ skill.get_proficiency_display }}</span>
-                                    <p class="diamond-duration">
-                                        {{ skill.year_started }} – {% if skill.is_ongoing %}Now{% else %}{{ skill.year_ended }}{% endif %}
-                                    </p>
+                    {% for skill in technical_skills %}
+                        <div class="diamond-item">
+                            <div class="diamond-shape">
+                                <div class="diamond-content">
+                                    {% if skill.name == "Python" %}
+                                        <i class="devicon-python-plain colored"></i>
+                                    {% elif skill.name == "Java" %}
+                                        <i class="devicon-java-plain colored"></i>
+                                    {% elif skill.name == "HTML" %}
+                                        <i class="devicon-html5-plain colored"></i>
+                                    {% elif skill.name == "Canva" %}
+                                        <i class="devicon-canva-original colored"></i>
+                                    {% elif skill.name == "CapCut" %}
+                                        <svg class="custom-icon" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M19.34 3.7a1 1 0 0 0-1.4 0l-5.94 5.95-5.94-5.95a1 1 0 0 0-1.41 1.42l6.65 6.65a1 1 0 0 0 1.41 0l6.64-6.65a1 1 0 0 0 0-1.42zM4.66 20.3a1 1 0 0 0 1.4 0l5.94-5.95 5.94 5.95a1 1 0 0 0 1.41-1.42l-6.65-6.65a1 1 0 0 0 0 1.42z"/>
+                                        </svg>
+                                    {% else %}
+                                        <span class="icon-fallback">⚡</span>
+                                    {% endif %}
                                 </div>
                             </div>
-                        {% endif %}
+
+                            <div class="diamond-info">
+                                <h3 class="diamond-title">{{ skill.name }}</h3>
+                                <span class="diamond-badge">{{ skill.get_proficiency_display }}</span>
+                                <p class="diamond-duration">
+                                    {{ skill.year_started }} – {% if skill.is_ongoing %}Now{% else %}{{ skill.year_ended }}{% endif %}
+                                </p>
+                            </div>
+                        </div>
                     {% empty %}
                         <p class="empty-state">Belum ada skill yang ditambahkan.</p>
                     {% endfor %}
                 </div>
 
                 <!-- Soft Skills -->
-                                <!-- Soft Skills (Floating Pill Capsule) -->
                 <h2 class="skills-subheading">Soft Skills</h2>
                 <div class="soft-skills-grid">
-                    {% for skill in skill_list %}
-                        {% if skill.category == 'soft_skill' %}
-                            <div class="pill-card">
-                                <div class="pill-icon">
-                                    {% if "Japanese" in skill.name %}
-                                        🇯🇵
-                                    {% elif "Chinese" in skill.name %}
-                                        🇨🇳
-                                    {% elif "English" in skill.name %}
-                                        🇬🇧
-                                    {% elif "Indonesian" in skill.name or "Indonesia" in skill.name %}
-                                        🇮🇩
-                                    {% elif "Problem" in skill.name %}
-                                        🧩
-                                    {% elif "Communication" in skill.name %}
-                                        💬
-                                    {% elif "Leadership" in skill.name or "Leader" in skill.name %}
-                                        👥
-                                    {% else %}
-                                        🌸
-                                    {% endif %}
-                                </div>
-                                <div class="pill-text">
-                                    <p class="pill-title">{{ skill.name }}</p>
-                                    <p class="pill-meta">
-                                        {{ skill.get_proficiency_display }} · {{ skill.year_started }}–{% if skill.is_ongoing %}Now{% else %}{{ skill.year_ended }}{% endif %}
-                                    </p>
-                                </div>
+                    {% for skill in soft_skills %}
+                        <div class="pill-card">
+                            <div class="pill-icon">
+                                {% if "Japanese" in skill.name %}
+                                    🇯🇵
+                                {% elif "Chinese" in skill.name %}
+                                    🇨🇳
+                                {% elif "English" in skill.name %}
+                                    🇬🇧
+                                {% elif "Indonesian" in skill.name or "Indonesia" in skill.name %}
+                                    🇮🇩
+                                {% elif "Problem" in skill.name %}
+                                    🧩
+                                {% elif "Communication" in skill.name %}
+                                    💬
+                                {% elif "Leadership" in skill.name or "Leader" in skill.name %}
+                                    👥
+                                {% else %}
+                                    🌸
+                                {% endif %}
                             </div>
-                        {% endif %}
+                            <div class="pill-text">
+                                <p class="pill-title">{{ skill.name }}</p>
+                                <p class="pill-meta">
+                                    {{ skill.get_proficiency_display }} · {{ skill.year_started }}–{% if skill.is_ongoing %}Now{% else %}{{ skill.year_ended }}{% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p class="empty-state">Belum ada soft skill yang ditambahkan.</p>
                     {% endfor %}
                 </div>
             </div>
