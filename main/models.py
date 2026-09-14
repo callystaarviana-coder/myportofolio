@@ -1,6 +1,7 @@
 import uuid
 from django.db import models
 
+#experience 
 class Experience(models.Model):
     EXPERIENCE_CHOICES = [
         ('internship', 'Internship'),
@@ -24,4 +25,29 @@ class Experience(models.Model):
     @property
     def is_ongoing(self):
         return self.ended_at is None 
-# Create your models here.
+
+
+# Skills
+class Skill(models.Model):
+    SKILL_CATEGORY_CHOICES = [
+        ('technical', 'Technical'),
+        ('soft_skill', 'Soft Skill'),
+    ]
+    PROFICIENCY_CHOICES = [
+        ('beginner', 'Beginner'),
+        ('intermediate', 'Intermediate'),
+        ('advanced', 'Advanced'),
+    ]
+
+    name = models.CharField(max_length=100)
+    category = models.CharField(max_length=20, choices=SKILL_CATEGORY_CHOICES, default='technical')
+    proficiency = models.CharField(max_length=20, choices=PROFICIENCY_CHOICES, default='beginner')
+    year_started = models.PositiveIntegerField()
+    year_ended = models.PositiveIntegerField(blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
+    @property
+    def is_ongoing(self):
+        return self.year_ended is None

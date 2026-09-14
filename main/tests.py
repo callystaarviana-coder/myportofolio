@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from main.models import Experience
+from main.models import Experience, Skill
 
 
 class MainTest(TestCase):
@@ -56,3 +56,43 @@ class MainTest(TestCase):
         self.assertFalse(self.experience.is_ongoing)
         self.assertContains(response, "Selesai")
         self.assertNotContains(response, "Sedang berlangsung")
+
+
+class SkillTest(TestCase):
+    def setUp(self):
+        self.tech_skill = Skill.objects.create(
+            name="Python",
+            category="technical",
+            proficiency="intermediate",
+            year_started=2024,
+        )
+        self.soft_skill = Skill.objects.create(
+            name="Problem Solving",
+            category="soft_skill",
+            proficiency="intermediate",
+            year_started=2023,
+        )
+
+    def test_skills_url_is_accessible(self):
+        response = self.client.get(reverse("main:show_skills"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "skills.html")
+        self.assertContains(response, f'href="{reverse("main:show_main")}"')
+
+    def test_skills_page_shows_data(self):
+        response = self.client.get(reverse("main:show_skills"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.tech_skill.name)
+        self.assertContains(response, self.soft_skill.name)
+        self.assertContains(response, "Intermediate")
+
+    def test_empty_skills_page(self):
+        Skill.objects.all().delete()
+        response = self.client.get(reverse("main:show_skills"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Belum ada skill yang ditambahkan.")
+
+    def test_skill_model(self):
+        self.assertEqual(str(self.tech_skill), "Python")
+        self.assertEqual(self.tech_skill.category, "technical")
+        self.assertTrue(self.tech_skill.is_ongoing)

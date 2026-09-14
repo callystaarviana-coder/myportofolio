@@ -5,7 +5,6 @@
 }
 
 :root {
-  /* Ungu Muda & Biru Muda */
   --bg-main: #f5f3ff;        
   --paper: #ffffff;          
   --ink: #2e1065;            
@@ -435,4 +434,195 @@ h1, .brand {
     margin-top: 1rem;
     font-size: 0.85rem;
     font-weight: 600;
+}
+
+/* skills */
+
+.skills-section {
+    padding: 4rem 0;
+    border-top: 1px solid var(--line);
+}
+
+.skills-subheading {
+    margin-top: 2.5rem;
+    margin-bottom: 2rem;
+    font-size: 1.35rem;
+    color: var(--text-dark, #1e293b);
+}
+
+.diamond-grid {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 3rem 2.5rem;
+    padding: 1.5rem 0.5rem;
+}
+
+.diamond-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 145px;
+    text-align: center;
+}
+
+/* Diamond */
+.diamond-shape {
+    width: 90px;
+    height: 90px;
+    margin: 18px auto 24px auto;
+    background: linear-gradient(-45deg, #7dd3fc 0%, #a5b4fc 45%, #fbcfe8 80%, #fce7f3 100%);
+    
+    border: 2.5px solid #2563eb;
+    border-radius: 10px;
+    transform: rotate(45deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.2);
+    cursor: pointer;
+    overflow: visible;
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                box-shadow 0.35s ease, 
+                border-color 0.3s ease;
+}
+
+/* Nudge */
+.diamond-shape:hover {
+    transform: rotate(45deg) translateY(-8px) scale(1.08);
+    border-color: #1d4ed8; 
+    box-shadow: 0 12px 28px rgba(37, 99, 235, 0.35);
+}
+
+.diamond-content {
+    transform: rotate(-45deg); 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.diamond-shape:hover .diamond-content {
+    transform: rotate(-30deg) scale(1.15); 
+}
+
+/* Ukuran Ikon */
+.diamond-content i {
+    font-size: 2.7rem;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.12));
+}
+
+.diamond-content .custom-icon {
+    width: 40px;
+    height: 40px;
+    color: #ffffff;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.diamond-content .icon-fallback {
+    font-size: 2.4rem;
+}
+
+
+.diamond-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    width: 100%;
+}
+
+.diamond-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-dark, #0f172a);
+}
+
+
+.diamond-badge {
+    display: inline-block;
+    padding: 0.2rem 0.65rem;
+    background: #f1f5f9;
+    color: var(--accent-dark, #2563eb);
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.diamond-duration {
+    font-size: 0.75rem;
+    color: var(--text-muted, #64748b);
+    margin: 0;
+}
+
+/* soft skills*/
+
+.soft-skills-grid {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1.25rem 1.5rem;
+    padding: 1rem 0;
+}
+
+
+.pill-card {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.85rem;
+    background-color: #fff1f5;
+    border: 2px solid #db2777;
+    border-radius: 9999px;
+    padding: 0.6rem 1.4rem; 
+    box-shadow: 0 4px 14px rgba(219, 39, 119, 0.12);
+    cursor: pointer;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                box-shadow 0.3s ease, 
+                border-color 0.3s ease;
+}
+
+
+.pill-card:hover {
+    transform: translateY(-6px) scale(1.05);
+    border-color: #be185d;
+    box-shadow: 0 10px 24px rgba(219, 39, 119, 0.28);
+}
+
+
+.pill-icon {
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+}
+
+.pill-card:hover .pill-icon {
+    transform: scale(1.2) rotate(10deg); 
+}
+
+.pill-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.pill-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #831843; 
+    margin: 0;
+    line-height: 1.2;
+}
+
+.pill-meta {
+    font-size: 0.72rem;
+    color: #9d174d;
+    opacity: 0.85;
+    margin: 0;
 }
