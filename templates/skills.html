@@ -1,13 +1,17 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Skills - {{name}} </title>
+    <title>Skills - {{ name }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/style.css">
+    <!-- Devicon Icons CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css">
+    <!-- Menggunakan parameter ?v=2 agar browser tidak men-cache CSS lama -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=2">
 </head> 
 <body>
     <header class="site-header">
@@ -27,29 +31,62 @@
                 <p class="section-kicker">Kemampuan yang saya miliki</p>
                 <h1>Skills</h1>
 
-                <div class="skills-grid">
+                <!-- Technical Skills -->
+                <h2 class="skills-subheading">Technical Skills</h2>
+                <div class="diamond-grid">
                     {% for skill in skill_list %}
-                        <article class="skill-card">
-                            <span class="skill-category">
-                                {{ skill.get_category_display }}
-                            </span>
-                            <h2>{{ skill.name }}</h2>
-                            <p class="skill-proficiency">
-                                {{ skill.get_proficiency_display }}
-                            </p>
-                            <p class="skill-duration">
-                                {{ skill.year_started }} -
-                                {% if skill.is_ongoing %}
-                                    Now
-                                {% else %}
-                                    {{ skill.year_ended }}
-                                {% endif %}
-                            </p>
-                        </article>
+                        {% if skill.category == 'technical' %}
+                            <div class="diamond-item">
+                                <!-- Kotak Diamond dengan efek Nudge -->
+                                <div class="diamond-shape">
+                                    <div class="diamond-content">
+                                        {% if skill.name == "Python" %}
+                                            <i class="devicon-python-plain colored"></i>
+                                        {% elif skill.name == "Java" %}
+                                            <i class="devicon-java-plain colored"></i>
+                                        {% elif skill.name == "HTML" %}
+                                            <i class="devicon-html5-plain colored"></i>
+                                        {% elif skill.name == "Canva" %}
+                                            <i class="devicon-canva-original colored"></i>
+                                        {% elif skill.name == "CapCut" %}
+                                            <!-- SVG CapCut logo resmi dan jernih -->
+                                            <svg class="custom-icon" viewBox="0 0 24 24" fill="currentColor">
+                                                <path d="M19.34 3.7a1 1 0 0 0-1.4 0l-5.94 5.95-5.94-5.95a1 1 0 0 0-1.41 1.42l6.65 6.65a1 1 0 0 0 1.41 0l6.64-6.65a1 1 0 0 0 0-1.42zM4.66 20.3a1 1 0 0 0 1.4 0l5.94-5.95 5.94 5.95a1 1 0 0 0 1.41-1.42l-6.65-6.65a1 1 0 0 0-1.41 0l-6.64 6.65a1 1 0 0 0 0 1.42z"/>
+                                            </svg>
+                                        {% else %}
+                                            <span class="icon-fallback">⚡</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- Keterangan di LUAR diamond (di bawahnya) -->
+                                <div class="diamond-info">
+                                    <h3 class="diamond-title">{{ skill.name }}</h3>
+                                    <span class="diamond-badge">{{ skill.get_proficiency_display }}</span>
+                                    <p class="diamond-duration">
+                                        {{ skill.year_started }} – {% if skill.is_ongoing %}Now{% else %}{{ skill.year_ended }}{% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        {% endif %}
                     {% empty %}
-                        <p class="empty-state">
-                            Belum ada skill yang ditambahkan.
-                        </p>
+                        <p class="empty-state">Belum ada skill yang ditambahkan.</p>
+                    {% endfor %}
+                </div>
+
+                <!-- Soft Skills -->
+                <h2 class="skills-subheading">Soft Skills</h2>
+                <div class="soft-skills-grid">
+                    {% for skill in skill_list %}
+                        {% if skill.category == 'soft_skill' %}
+                            <article class="soft-skill-card">
+                                <h3>{{ skill.name }}</h3>
+                                <span class="diamond-badge">{{ skill.get_proficiency_display }}</span>
+                                <p class="diamond-duration">
+                                    {{ skill.year_started }} – {% if skill.is_ongoing %}Now{% else %}{{ skill.year_ended }}{% endif %}
+                                </p>
+                            </article>
+                        {% endif %}
                     {% endfor %}
                 </div>
             </div>
@@ -58,7 +95,7 @@
         
     <footer class="site-footer">
         <div class="container">
-            <p>&copy; 2026 {{name}}. Fakultas Ilmu Komputer, Universitas Indonesia.</p>
+            <p>&copy; 2026 {{ name }}. Fakultas Ilmu Komputer, Universitas Indonesia.</p>
         </div>
     </footer>
 </body>
