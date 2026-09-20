@@ -19,11 +19,20 @@
                 <a href="{% url 'main:show_experience' %}">Experience</a>
                 <a href="{% url 'main:show_skills' %}">Skills</a>
                 <a href="{% url 'main:show_projects' %}">Projects</a>
+                <a href="{% url 'main:show_education' %}">Education</a>
             </nav>
         </div>
     </header>
 
     <main>
+        {% if messages %}
+        <div class="container" role="status">
+            {% for message in messages %}
+            <p class="notice">{{ message }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
         {% block content %}{% endblock content %}
     </main>
 

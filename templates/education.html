@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block meta %}
+<title>Education - {{ name }}</title>
+{% endblock meta %}
+
+{% block content %}
+<section class="experience-section">
+    <div class="container">
+        <p class="section-kicker">Perjalanan pendidikan saya</p>
+
+        <div class="project-header">
+            <h1>Education</h1>
+            <a href="{% url 'main:create_education' %}" class="button">
+                + Tambah Pendidikan
+            </a>
+        </div>
+
+        <div class="education-grid">
+            {% for education in education_list %}
+            <article class="education-card">
+                <p class="education-period">
+                    {{ education.year_started }} –
+                    {% if education.is_current %}
+                        Sekarang
+                    {% else %}
+                        {{ education.year_ended|default_if_none:"—" }}
+                    {% endif %}
+                </p>
+
+                <h2>{{ education.institution }}</h2>
+                <p class="degree">{{ education.degree }}</p>
+                <p class="description">
+                    {{ education.description|linebreaksbr }}
+                </p>
+
+                <div class="education-tags">
+                    <span>
+                        {% if education.is_current %}
+                            Masih menempuh pendidikan
+                        {% else %}
+                            Selesai
+                        {% endif %}
+                    </span>
+                </div>
+
+                <div class="education-actions">
+                    <a href="{% url 'main:update_education' education.id %}"
+                       class="button button-secondary">
+                        Edit
+                    </a>
+
+                    <form method="post"
+                          action="{% url 'main:delete_education' education.id %}"
+                          onsubmit="return confirm('Yakin ingin menghapus data pendidikan ini?');">
+                        {% csrf_token %}
+                        <button type="submit" class="button button-danger">
+                            Hapus
+                        </button>
+                    </form>
+                </div>
+            </article>
+            {% empty %}
+            <p class="empty-state">
+                Belum ada pendidikan. Klik Tambah Pendidikan untuk mengisinya.
+            </p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock content %}
