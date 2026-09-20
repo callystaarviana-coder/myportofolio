@@ -7,6 +7,8 @@ from main.models import Experience, Skill
 
 class MainTest(TestCase):
     def setUp(self):
+        Experience.objects.all().delete()
+
         self.experience = Experience.objects.create(
             title="Asisten Dosen PBP",
             description="Membantu mahasiswa memahami pengembangan web.",
@@ -60,6 +62,9 @@ class MainTest(TestCase):
 
 class SkillTest(TestCase):
     def setUp(self):
+        
+        Skill.objects.all().delete()
+
         self.tech_skill = Skill.objects.create(
             name="Python",
             category="technical",
