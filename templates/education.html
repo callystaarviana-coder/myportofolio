@@ -11,9 +11,11 @@
 
         <div class="project-header">
             <h1>Education</h1>
-            <a href="{% url 'main:create_education' %}" class="button">
-                + Tambah Pendidikan
-            </a>
+            {% if user.is_superuser %}
+                <a href="{% url 'main:create_education' %}" class="button">
+                    + Tambah Pendidikan
+                </a>
+            {% endif %}
         </div>
 
         <div class="education-grid">
@@ -44,25 +46,34 @@
                     </span>
                 </div>
 
-                <div class="education-actions">
-                    <a href="{% url 'main:update_education' education.id %}"
-                       class="button button-secondary">
-                        Edit
-                    </a>
+                {% include "components/education_star.html" with education=education %}
 
-                    <form method="post"
-                          action="{% url 'main:delete_education' education.id %}"
-                          onsubmit="return confirm('Yakin ingin menghapus data pendidikan ini?');">
-                        {% csrf_token %}
-                        <button type="submit" class="button button-danger">
-                            Hapus
-                        </button>
-                    </form>
-                </div>
+                {% if user.is_superuser or is_editor %}
+                    <div class="education-actions">
+                        <a href="{% url 'main:update_education' education.id %}"
+                        class="button button-secondary">
+                            Edit
+                        </a>
+
+                        {% if user.is_superuser %}
+                            <form method="post"
+                                action="{% url 'main:delete_education' education.id %}"
+                                onsubmit="return confirm('Yakin ingin menghapus data pendidikan ini?');">
+                                {% csrf_token %}
+                                <button type="submit" class="button button-danger">
+                                    Hapus
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+                {% endif %}
             </article>
             {% empty %}
             <p class="empty-state">
-                Belum ada pendidikan. Klik Tambah Pendidikan untuk mengisinya.
+                Belum ada pendidikan.
+                {% if user.is_superuser %}
+                    Klik Tambah Pendidikan untuk mengisinya.
+                {% endif %}
             </p>
             {% endfor %}
         </div>

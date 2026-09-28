@@ -83,5 +83,11 @@ class Education(models.Model):
     year_ended = models.PositiveIntegerField(blank=True, null=True)
     is_current = models.BooleanField(default=False)
 
+    starred_by = models.ManyToManyField(
+        User,
+        related_name="starred_educations",
+        blank=True,
+    )
+
     def __str__(self):
         return self.institution

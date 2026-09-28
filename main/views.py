@@ -80,7 +80,7 @@ def get_projects_json(request):
         projects,
         use_natural_foreign_keys=True,
     )
-    
+
     return HttpResponse(projects_json, content_type="application/json")
 
 def show_projects(request):
@@ -114,7 +114,11 @@ def delete_project(request, project_id):
 
     return redirect("main:show_projects")
 
+@login_required(login_url="/login/")
 def create_education(request):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
     form = EducationForm(
         request.POST if request.method == "POST" else None
     )
@@ -132,8 +136,15 @@ def create_education(request):
     return render(request, "education_form.html", context)
 
 
+@login_required(login_url="/login/")
 def update_education(request, education_id):
+    is_editor = request.user.groups.filter(name="Editor").exists()
+
+    if not (request.user.is_superuser or is_editor):
+        raise PermissionDenied
+
     education = get_object_or_404(Education, pk=education_id)
+
     form = EducationForm(
         request.POST if request.method == "POST" else None,
         instance=education,
@@ -152,17 +163,28 @@ def update_education(request, education_id):
     return render(request, "education_form.html", context)
 
 
+@login_required(login_url="/login/")
 @require_POST
 def delete_education(request, education_id):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
     education = get_object_or_404(Education, pk=education_id)
     education.delete()
+
     messages.success(request, "Data pendidikan berhasil dihapus.")
     return redirect("main:show_education")
 
 
 def get_education_json(request):
     education_list = Education.objects.order_by("-year_started", "-pk")
-    data = serializers.serialize("json", education_list)
+
+    data = serializers.serialize(
+        "json",
+        education_list,
+        use_natural_foreign_keys=True,
+    )
+
     return HttpResponse(data, content_type="application/json")
 
 
@@ -175,9 +197,15 @@ def show_education(request):
     )
     education_list = [item.object for item in education_data]
 
+    is_editor = (
+        request.user.is_authenticated
+        and request.user.groups.filter(name="Editor").exists()
+    )
+
     context = {
         "name": "Callysta Arviana",
         "education_list": education_list,
+        "is_editor": is_editor,
     }
     return render(request, "education.html", context)
 
@@ -232,3 +260,15 @@ def toggle_star(request, project_id):
             project.starred_by.add(request.user)
 
     return redirect("main:show_projects")
+
+@login_required(login_url="/login/")
+@require_POST
+def toggle_education_star(request, education_id):
+    education = get_object_or_404(Education, pk=education_id)
+
+    if education.starred_by.filter(pk=request.user.pk).exists():
+        education.starred_by.remove(request.user)
+    else:
+        education.starred_by.add(request.user)
+
+    return redirect("main:show_education")
