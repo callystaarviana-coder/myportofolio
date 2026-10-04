@@ -193,26 +193,40 @@ def delete_education(request, education_id):
 
 
 def get_education_json(request):
-    education_list = Education.objects.order_by("-year_started", "-pk")
-
-    data = serializers.serialize(
-        "json",
-        education_list,
-        use_natural_foreign_keys=True,
+    education_list = (
+        Education.objects
+        .prefetch_related("starred_by")
+        .order_by("-year_started", "-pk")
     )
 
-    return HttpResponse(data, content_type="application/json")
+    data = []
 
+    for education in education_list:
+        starred_users = education.starred_by.all()
+
+        is_starred = (
+            request.user in starred_users
+            if request.user.is_authenticated
+            else False
+        )
+
+        data.append({
+            "pk": education.pk,
+            "fields": {
+                "institution": education.institution,
+                "degree": education.degree,
+                "description": education.description,
+                "year_started": education.year_started,
+                "year_ended": education.year_ended,
+                "is_current": education.is_current,
+                "star_count": starred_users.count(),
+                "is_starred": is_starred,
+            },
+        })
+
+    return JsonResponse(data, safe=False)
 
 def show_education(request):
-    json_response = get_education_json(request)
-
-    education_data = serializers.deserialize(
-        "json",
-        json_response.content.decode("utf-8"),
-    )
-    education_list = [item.object for item in education_data]
-
     is_editor = (
         request.user.is_authenticated
         and request.user.groups.filter(name="Editor").exists()
@@ -220,11 +234,11 @@ def show_education(request):
 
     context = {
         "name": "Callysta Arviana",
-        "education_list": education_list,
         "is_editor": is_editor,
     }
-    return render(request, "education.html", context)
 
+    return render(request, "education.html", context)
+    
 def register(request):
     form = UserCreationForm(request.POST or None)
 
