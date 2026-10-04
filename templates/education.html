@@ -13,11 +13,27 @@
             <h1>Education</h1>
 
             {% if user.is_superuser %}
-                <a href="{% url 'main:create_education' %}" class="button">
+                <button type="button"
+                        class="button"
+                        popovertarget="add-education-modal">
                     + Tambah Pendidikan
-                </a>
+                </button>
             {% endif %}
+
         </div>
+
+            <form id="education-search-form" class="project-search">
+                <input
+                    type="search"
+                    id="education-search-input"
+                    name="institution"
+                    value="{{ institution_query }}"
+                    placeholder="Cari nama sekolah atau universitas"
+                    class="project-search__input"
+                    aria-label="Cari nama sekolah atau universitas">
+
+                <button type="submit" class="button">Cari</button>
+            </form>
 
         <!-- Loading state -->
         <div id="education-loading" class="empty-state" role="status">
@@ -26,12 +42,7 @@
 
         <!-- Empty state -->
         <div id="education-empty" class="empty-state hide" role="status">
-            <p>
-                Belum ada pendidikan.
-                {% if user.is_superuser %}
-                    Klik Tambah Pendidikan untuk mengisinya.
-                {% endif %}
-            </p>
+            <p>Belum ada data pendidikan atau tidak ada hasil yang cocok.</p>
         </div>
 
         <!-- Error state -->
@@ -43,6 +54,10 @@
         <div id="education-grid" class="education-grid hide"></div>
     </div>
 </section>
+
+{% if user.is_superuser %}
+    {% include "components/education_form_modal.html" %}
+{% endif %}
 
 <script>
     // Konfigurasi endpoint dan hak akses
@@ -59,8 +74,13 @@
     const educationEmpty = document.getElementById('education-empty');
     const educationError = document.getElementById('education-error');
     const educationGrid = document.getElementById('education-grid');
+    const educationSearchForm = document.getElementById('education-search-form');
+    const educationSearchInput = document.getElementById('education-search-input');
 
-    // Menampilkan kondisi halaman yang sesuai
+    const EDUCATION_DEBOUNCE_DELAY = 300;
+    let educationSearchTimer;
+    let educationAbortController;
+
     function displayEducationSection({
         showLoading = false,
         showEmpty = false,
@@ -73,7 +93,7 @@
         educationGrid.classList.toggle('hide', !showGrid);
     }
 
-    // Data dari JSON harus di-escape sebelum dimasukkan ke HTML
+    
     function escapeHtml(value) {
         return String(value ?? '')
             .replaceAll('&', '&amp;')
@@ -83,7 +103,7 @@
             .replaceAll("'", '&#39;');
     }
 
-    // Membuat satu kartu pendidikan
+    
     function buildEducationCardElement(item) {
         const education = item.fields;
         const educationId = item.pk;
@@ -176,15 +196,26 @@
         return article;
     }
 
-    // Mengambil daftar pendidikan dari server
-    async function fetchEducation() {
+    async function fetchEducation(searchQuery = '') {
+        if (educationAbortController) {
+            educationAbortController.abort();
+        }
+
+        const controller = new AbortController();
+        educationAbortController = controller;
+
         displayEducationSection({ showLoading: true });
 
         try {
-            const response = await fetch(EDUCATION_ENDPOINT, {
+            const url = searchQuery
+                ? `${EDUCATION_ENDPOINT}?institution=${encodeURIComponent(searchQuery)}`
+                : EDUCATION_ENDPOINT;
+
+            const response = await fetch(url, {
                 headers: {
                     'Accept': 'application/json'
-                }
+                },
+                signal: controller.signal
             });
 
             if (!response.ok) {
@@ -194,6 +225,11 @@
             }
 
             const educationData = await response.json();
+
+            // Jangan tampilkan hasil dari permintaan yang sudah dibatalkan
+            if (controller.signal.aborted) {
+                return;
+            }
 
             if (!Array.isArray(educationData)) {
                 throw new Error('Format data pendidikan tidak sesuai.');
@@ -214,12 +250,98 @@
 
             displayEducationSection({ showGrid: true });
         } catch (error) {
+            if (error.name === 'AbortError' || controller.signal.aborted) {
+                return;
+            }
+
             console.error('Error loading education:', error);
             displayEducationSection({ showError: true });
         }
     }
 
-    // Memuat data saat halaman dibuka
-    fetchEducation();
+    function searchEducation() {
+        fetchEducation(educationSearchInput.value.trim());
+    }
+
+    educationSearchInput.addEventListener('input', function() {
+        clearTimeout(educationSearchTimer);
+
+        educationSearchTimer = setTimeout(function() {
+            searchEducation();
+        }, EDUCATION_DEBOUNCE_DELAY);
+    });
+
+    educationSearchForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        clearTimeout(educationSearchTimer);
+        searchEducation();
+    });
+
+    const CREATE_EDUCATION_ENDPOINT = "{% url 'main:create_education_ajax' %}";
+    const educationForm = document.getElementById('education-form');
+    const educationFormError = document.getElementById('education-form-error');
+
+    function closeEducationModal() {
+        document.getElementById('add-education-modal').hidePopover();
+    }
+
+    async function addEducation(event) {
+        event.preventDefault();
+
+        const submitButton = educationForm.querySelector(
+            'button[type="submit"]'
+        );
+
+        if (submitButton.disabled) {
+            return;
+        }
+
+        submitButton.disabled = true;
+        educationFormError.textContent = '';
+        educationFormError.classList.add('hide');
+
+        try {
+            const response = await fetch(CREATE_EDUCATION_ENDPOINT, {
+                method: 'POST',
+                body: new FormData(educationForm)
+            });
+
+            const result = await response.json().catch(() => ({}));
+
+            if (response.ok) {
+                educationForm.reset();
+                closeEducationModal();
+
+                clearTimeout(educationSearchTimer);
+                await fetchEducation(educationSearchInput.value.trim());
+            } else {
+                const errorMessages = result.errors
+                    ? Object.values(result.errors)
+                        .flat()
+                        .map(error => error.message)
+                    : [
+                        result.message ||
+                        `Terjadi kesalahan (status ${response.status}).`
+                    ];
+
+                educationFormError.textContent = errorMessages.join(' ');
+                educationFormError.classList.remove('hide');
+            }
+        } catch (error) {
+            console.error('Error adding education:', error);
+
+            educationFormError.textContent =
+                'Tidak dapat terhubung ke server. Silakan coba lagi.';
+            educationFormError.classList.remove('hide');
+        } finally {
+            submitButton.disabled = false;
+        }
+    }
+
+    if (educationForm) {
+        educationForm.addEventListener('submit', addEducation);
+    }
+
+    searchEducation();
 </script>
 {% endblock content %}
