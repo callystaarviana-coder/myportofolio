@@ -193,11 +193,18 @@ def delete_education(request, education_id):
 
 
 def get_education_json(request):
+    institution_query = request.GET.get("institution", "").strip()
+
     education_list = (
         Education.objects
         .prefetch_related("starred_by")
         .order_by("-year_started", "-pk")
     )
+
+    if institution_query:
+        education_list = education_list.filter(
+            institution__icontains=institution_query
+        )
 
     data = []
 
@@ -227,6 +234,8 @@ def get_education_json(request):
     return JsonResponse(data, safe=False)
 
 def show_education(request):
+    institution_query = request.GET.get("institution", "").strip()
+
     is_editor = (
         request.user.is_authenticated
         and request.user.groups.filter(name="Editor").exists()
@@ -235,6 +244,7 @@ def show_education(request):
     context = {
         "name": "Callysta Arviana",
         "is_editor": is_editor,
+        "institution_query": institution_query,
     }
 
     return render(request, "education.html", context)
