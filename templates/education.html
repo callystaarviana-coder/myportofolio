@@ -285,7 +285,7 @@
         document.getElementById('add-education-modal').hidePopover();
     }
 
-    async function addEducation(event) {
+        async function addEducation(event) {
         event.preventDefault();
 
         const submitButton = educationForm.querySelector(
@@ -312,6 +312,12 @@
                 educationForm.reset();
                 closeEducationModal();
 
+                showToast(
+                    'Berhasil',
+                    result.message || 'Data pendidikan berhasil ditambahkan.',
+                    'success'
+                );
+
                 clearTimeout(educationSearchTimer);
                 await fetchEducation(educationSearchInput.value.trim());
             } else {
@@ -324,15 +330,31 @@
                         `Terjadi kesalahan (status ${response.status}).`
                     ];
 
-                educationFormError.textContent = errorMessages.join(' ');
+                const errorMessage = errorMessages.join(' ');
+
+                educationFormError.textContent = errorMessage;
                 educationFormError.classList.remove('hide');
+
+                showToast(
+                    'Gagal menambahkan pendidikan',
+                    errorMessage,
+                    'error'
+                );
             }
         } catch (error) {
             console.error('Error adding education:', error);
 
-            educationFormError.textContent =
+            const errorMessage =
                 'Tidak dapat terhubung ke server. Silakan coba lagi.';
+
+            educationFormError.textContent = errorMessage;
             educationFormError.classList.remove('hide');
+
+            showToast(
+                'Gagal menambahkan pendidikan',
+                errorMessage,
+                'error'
+            );
         } finally {
             submitButton.disabled = false;
         }

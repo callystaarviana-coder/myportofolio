@@ -146,9 +146,8 @@ def create_education(request):
 
     context = {
         "name": "Callysta Arviana",
-        "is_editor": is_editor,
-        "institution_query": institution_query,
-        "form": EducationForm(),
+        "form": form,
+        "page_title": "Tambah Pendidikan",
     }
     return render(request, "education_form.html", context)
 
@@ -246,6 +245,7 @@ def show_education(request):
         "name": "Callysta Arviana",
         "is_editor": is_editor,
         "institution_query": institution_query,
+        "form": EducationForm(),
     }
 
     return render(request, "education.html", context)
