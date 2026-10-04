@@ -11,6 +11,7 @@ from main.views import (
     delete_project,
     show_education,
     create_education,
+    create_education_ajax,
     update_education,
     delete_education,
     get_education_json,
@@ -45,6 +46,11 @@ urlpatterns = [
 
     path("education/", show_education, name="show_education"),
     path("education/add/", create_education, name="create_education"),
+    path(
+        "education/add-ajax/",
+        create_education_ajax,
+        name="create_education_ajax",
+    ),
     path(
         "education/<int:education_id>/edit/",
         update_education,

@@ -146,8 +146,9 @@ def create_education(request):
 
     context = {
         "name": "Callysta Arviana",
-        "form": form,
-        "page_title": "Tambah Pendidikan",
+        "is_editor": is_editor,
+        "institution_query": institution_query,
+        "form": EducationForm(),
     }
     return render(request, "education_form.html", context)
 
@@ -332,6 +333,34 @@ def create_project_ajax(request):
             {
                 "message": "Proyek berhasil ditambahkan.",
                 "pk": str(project.id),
+            },
+            status=201,
+        )
+
+    return JsonResponse(
+        {"errors": form.errors.get_json_data()},
+        status=400,
+    )
+
+@require_POST
+def create_education_ajax(request):
+    if not request.user.is_superuser:
+        return JsonResponse(
+            {
+                "message": "Hanya pemilik portofolio yang dapat menambahkan pendidikan."
+            },
+            status=403,
+        )
+
+    form = EducationForm(request.POST)
+
+    if form.is_valid():
+        education = form.save()
+
+        return JsonResponse(
+            {
+                "message": "Data pendidikan berhasil ditambahkan.",
+                "pk": education.pk,
             },
             status=201,
         )

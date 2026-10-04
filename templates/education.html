@@ -13,10 +13,13 @@
             <h1>Education</h1>
 
             {% if user.is_superuser %}
-                <a href="{% url 'main:create_education' %}" class="button">
+                <button type="button"
+                        class="button"
+                        popovertarget="add-education-modal">
                     + Tambah Pendidikan
-                </a>
+                </button>
             {% endif %}
+
         </div>
 
             <form id="education-search-form" class="project-search">
@@ -51,6 +54,10 @@
         <div id="education-grid" class="education-grid hide"></div>
     </div>
 </section>
+
+{% if user.is_superuser %}
+    {% include "components/education_form_modal.html" %}
+{% endif %}
 
 <script>
     // Konfigurasi endpoint dan hak akses
@@ -269,6 +276,71 @@
         clearTimeout(educationSearchTimer);
         searchEducation();
     });
+
+    const CREATE_EDUCATION_ENDPOINT = "{% url 'main:create_education_ajax' %}";
+    const educationForm = document.getElementById('education-form');
+    const educationFormError = document.getElementById('education-form-error');
+
+    function closeEducationModal() {
+        document.getElementById('add-education-modal').hidePopover();
+    }
+
+    async function addEducation(event) {
+        event.preventDefault();
+
+        const submitButton = educationForm.querySelector(
+            'button[type="submit"]'
+        );
+
+        if (submitButton.disabled) {
+            return;
+        }
+
+        submitButton.disabled = true;
+        educationFormError.textContent = '';
+        educationFormError.classList.add('hide');
+
+        try {
+            const response = await fetch(CREATE_EDUCATION_ENDPOINT, {
+                method: 'POST',
+                body: new FormData(educationForm)
+            });
+
+            const result = await response.json().catch(() => ({}));
+
+            if (response.ok) {
+                educationForm.reset();
+                closeEducationModal();
+
+                clearTimeout(educationSearchTimer);
+                await fetchEducation(educationSearchInput.value.trim());
+            } else {
+                const errorMessages = result.errors
+                    ? Object.values(result.errors)
+                        .flat()
+                        .map(error => error.message)
+                    : [
+                        result.message ||
+                        `Terjadi kesalahan (status ${response.status}).`
+                    ];
+
+                educationFormError.textContent = errorMessages.join(' ');
+                educationFormError.classList.remove('hide');
+            }
+        } catch (error) {
+            console.error('Error adding education:', error);
+
+            educationFormError.textContent =
+                'Tidak dapat terhubung ke server. Silakan coba lagi.';
+            educationFormError.classList.remove('hide');
+        } finally {
+            submitButton.disabled = false;
+        }
+    }
+
+    if (educationForm) {
+        educationForm.addEventListener('submit', addEducation);
+    }
 
     searchEducation();
 </script>
