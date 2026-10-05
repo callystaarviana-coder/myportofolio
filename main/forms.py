@@ -89,6 +89,24 @@ class EducationForm(ModelForm):
         widgets = {
             "description": Textarea(attrs={"rows": 3}),
         }
+    
+    def clean_institution(self):
+        institution = strip_tags(self.cleaned_data["institution"]).strip()
+        if not institution:
+            raise ValidationError("Nama sekolah / universitas tidak boleh kosong.")
+        return institution
+
+    def clean_degree(self):
+        degree = strip_tags(self.cleaned_data["degree"]).strip()
+        if not degree:
+            raise ValidationError("Jenjang / program studi tidak boleh kosong.")
+        return degree
+
+    def clean_description(self):
+        description = strip_tags(self.cleaned_data["description"]).strip()
+        if not description:
+            raise ValidationError("Deskripsi tidak boleh kosong.")
+        return description
 
     def clean(self):
         cleaned_data = super().clean()
