@@ -134,15 +134,14 @@
             .replace(/\r\n|\r|\n/g, '<br>');
 
         const editHtml = (IS_SUPERUSER || IS_EDITOR)
-            ? `<a href="${editUrl}" class="button button-secondary">
-                   Edit
+? `<a href="${escapeHtml(editUrl)}" class="button button-secondary">                   Edit
                </a>`
             : '';
 
         const deleteHtml = IS_SUPERUSER
             ? `<form
                     method="post"
-                    action="${deleteUrl}"
+                    action="${escapeHtml(deleteUrl)}"
                     onsubmit="return confirm('Yakin ingin menghapus data pendidikan ini?');">
                     {% csrf_token %}
                     <button type="submit" class="button button-danger">
@@ -175,7 +174,7 @@
                 <span>${statusText}</span>
             </div>
 
-            <form method="post" action="${starUrl}" class="star-form">
+            <form method="post" action="${escapeHtml(starUrl)}" class="star-form">
                 {% csrf_token %}
 
                 <button
