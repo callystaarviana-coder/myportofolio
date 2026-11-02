@@ -42,6 +42,7 @@ PRODUCTION = os.getenv('PRODUCTION', 'False').lower() == 'true'
 
 INSTALLED_APPS = [
     'main',
+    'contacts',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

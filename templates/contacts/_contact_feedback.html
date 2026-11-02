@@ -1,0 +1,11 @@
+<div id="feedback" hx-swap-oob="true" role="status" aria-live="polite">
+    {% if errors %}
+        {% for field_errors in errors.values %}
+            {% for error in field_errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+        {% endfor %}
+    {% else %}
+        Kontak berhasil ditambahkan!
+    {% endif %}
+</div>
