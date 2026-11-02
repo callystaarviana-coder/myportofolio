@@ -59,16 +59,18 @@
     {% include "components/education_form_modal.html" %}
 {% endif %}
 
+{% csrf_token %}
 <script>
     // Konfigurasi endpoint dan hak akses
-    const EDUCATION_ENDPOINT = "{% url 'main:get_education_json' %}";
+    const EDUCATION_ENDPOINT = "{% url 'api:education-list' %}";
     const IS_SUPERUSER = "{{ user.is_superuser|yesno:'true,false' }}" === "true";
     const IS_EDITOR = "{{ is_editor|yesno:'true,false' }}" === "true";
+    const IS_AUTHENTICATED = "{{ user.is_authenticated|yesno:'true,false' }}" === "true";
 
     // Education menggunakan ID integer, bukan UUID
     const EDUCATION_EDIT_URL = "{% url 'main:update_education' 0 %}";
-    const EDUCATION_DELETE_URL = "{% url 'main:delete_education' 0 %}";
-    const EDUCATION_STAR_URL = "{% url 'main:toggle_education_star' 0 %}";
+    const EDUCATION_DELETE_URL = "{% url 'api:education-detail' 0 %}";
+    const EDUCATION_STAR_URL = "{% url 'api:education-star' 0 %}";
 
     const educationLoading = document.getElementById('education-loading');
     const educationEmpty = document.getElementById('education-empty');
@@ -105,19 +107,12 @@
 
     
     function buildEducationCardElement(item) {
-        const education = item.fields;
-        const educationId = item.pk;
+        const education = item;
+        const educationId = item.id;
 
         const editUrl = EDUCATION_EDIT_URL.replace(
             '/0/', `/${educationId}/`
         );
-        const deleteUrl = EDUCATION_DELETE_URL.replace(
-            '/0/', `/${educationId}/`
-        );
-        const starUrl = EDUCATION_STAR_URL.replace(
-            '/0/', `/${educationId}/`
-        );
-
         const endYear = education.is_current
             ? 'Sekarang'
             : (education.year_ended ?? '—');
@@ -139,15 +134,10 @@
             : '';
 
         const deleteHtml = IS_SUPERUSER
-            ? `<form
-                    method="post"
-                    action="${escapeHtml(deleteUrl)}"
-                    onsubmit="return confirm('Yakin ingin menghapus data pendidikan ini?');">
-                    {% csrf_token %}
-                    <button type="submit" class="button button-danger">
+            ? `<button type="button" class="button button-danger"
+                       data-action="delete" data-id="${escapeHtml(educationId)}">
                         Hapus
-                    </button>
-               </form>`
+               </button>`
             : '';
 
         const actionsHtml = (IS_SUPERUSER || IS_EDITOR)
@@ -174,11 +164,11 @@
                 <span>${statusText}</span>
             </div>
 
-            <form method="post" action="${escapeHtml(starUrl)}" class="star-form">
-                {% csrf_token %}
-
+            <div class="star-form">
+                ${IS_AUTHENTICATED ? `
                 <button
-                    type="submit"
+                    type="button"
+                    data-action="star" data-id="${escapeHtml(educationId)}"
                     class="button button-star${starClass}"
                     aria-pressed="${education.is_starred ? 'true' : 'false'}">
                     <span aria-hidden="true">★</span>
@@ -186,8 +176,11 @@
                     <span class="star-count">
                         ${escapeHtml(education.star_count)}
                     </span>
-                </button>
-            </form>
+                </button>` : `
+                <a href="{% url 'main:login' %}" class="button button-star">
+                    Login untuk star (${escapeHtml(education.star_count)})
+                </a>`}
+            </div>
 
             ${actionsHtml}
         `;
@@ -276,7 +269,7 @@
         searchEducation();
     });
 
-    const CREATE_EDUCATION_ENDPOINT = "{% url 'main:create_education_ajax' %}";
+    const CREATE_EDUCATION_ENDPOINT = EDUCATION_ENDPOINT;
     const educationForm = document.getElementById('education-form');
     const educationFormError = document.getElementById('education-form-error');
 
@@ -284,7 +277,54 @@
         document.getElementById('add-education-modal').hidePopover();
     }
 
-        async function addEducation(event) {
+    function getCookie(name) {
+        const prefix = `${name}=`;
+        const cookie = document.cookie.split(';').map(value => value.trim())
+            .find(value => value.startsWith(prefix));
+        return cookie ? decodeURIComponent(cookie.slice(prefix.length)) : null;
+    }
+
+    function educationApiError(data, status) {
+        const messages = Object.values(data).flat().filter(value => typeof value === 'string');
+        return messages.join(' ') || `Permintaan gagal (HTTP ${status}).`;
+    }
+
+    async function writeEducation(url, method, payload) {
+        const response = await fetch(url, {
+            method,
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            body: payload === undefined ? undefined : JSON.stringify(payload),
+        });
+        if (response.status === 204) return null;
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(educationApiError(data, response.status));
+        return data;
+    }
+
+    educationGrid.addEventListener('click', async function(event) {
+        const button = event.target.closest('button[data-action]');
+        if (!button || button.disabled) return;
+        const action = button.dataset.action;
+        if (action === 'delete' && !window.confirm('Yakin ingin menghapus data pendidikan ini?')) return;
+        button.disabled = true;
+        try {
+            const pattern = action === 'star' ? EDUCATION_STAR_URL : EDUCATION_DELETE_URL;
+            const url = pattern.replace('/0/', `/${button.dataset.id}/`);
+            await writeEducation(url, action === 'star' ? 'POST' : 'DELETE');
+            showToast('Berhasil', action === 'star' ? 'Star diperbarui.' : 'Data pendidikan berhasil dihapus.', 'success');
+            await fetchEducation(educationSearchInput.value.trim());
+        } catch (error) {
+            showToast('Permintaan gagal', error.message, 'error');
+        } finally {
+            button.disabled = false;
+        }
+    });
+
+    async function addEducation(event) {
         event.preventDefault();
 
         const submitButton = educationForm.querySelector(
@@ -300,51 +340,30 @@
         educationFormError.classList.add('hide');
 
         try {
-            const response = await fetch(CREATE_EDUCATION_ENDPOINT, {
-                method: 'POST',
-                body: new FormData(educationForm)
+            const fields = new FormData(educationForm);
+            await writeEducation(CREATE_EDUCATION_ENDPOINT, 'POST', {
+                institution: fields.get('institution'),
+                degree: fields.get('degree'),
+                description: fields.get('description'),
+                year_started: Number(fields.get('year_started')),
+                year_ended: fields.get('year_ended') ? Number(fields.get('year_ended')) : null,
+                is_current: fields.has('is_current'),
             });
+            educationForm.reset();
+            closeEducationModal();
 
-            const result = await response.json().catch(() => ({}));
+            showToast(
+                'Berhasil',
+                'Data pendidikan berhasil ditambahkan.',
+                'success'
+            );
 
-            if (response.ok) {
-                educationForm.reset();
-                closeEducationModal();
-
-                showToast(
-                    'Berhasil',
-                    result.message || 'Data pendidikan berhasil ditambahkan.',
-                    'success'
-                );
-
-                clearTimeout(educationSearchTimer);
-                await fetchEducation(educationSearchInput.value.trim());
-            } else {
-                const errorMessages = result.errors
-                    ? Object.values(result.errors)
-                        .flat()
-                        .map(error => error.message)
-                    : [
-                        result.message ||
-                        `Terjadi kesalahan (status ${response.status}).`
-                    ];
-
-                const errorMessage = errorMessages.join(' ');
-
-                educationFormError.textContent = errorMessage;
-                educationFormError.classList.remove('hide');
-
-                showToast(
-                    'Gagal menambahkan pendidikan',
-                    errorMessage,
-                    'error'
-                );
-            }
+            clearTimeout(educationSearchTimer);
+            await fetchEducation(educationSearchInput.value.trim());
         } catch (error) {
             console.error('Error adding education:', error);
 
-            const errorMessage =
-                'Tidak dapat terhubung ke server. Silakan coba lagi.';
+            const errorMessage = error.message;
 
             educationFormError.textContent = errorMessage;
             educationFormError.classList.remove('hide');
