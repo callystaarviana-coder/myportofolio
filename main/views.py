@@ -175,6 +175,7 @@ def update_education(request, education_id):
         "name": "Callysta Arviana",
         "form": form,
         "page_title": "Edit Pendidikan",
+        "education": education,
     }
     return render(request, "education_form.html", context)
 

@@ -9,7 +9,8 @@
     <div class="container">
         <h1>{{ page_title }}</h1>
 
-        <form method="post" class="project-form">
+        <form method="post" class="project-form"
+            {% if education %}data-education-api="{% url 'api:education-detail' education.pk %}"{% endif %}>
             {% csrf_token %}
 
             {% for error in form.non_field_errors %}
@@ -40,4 +41,61 @@
         </form>
     </div>
 </section>
+{% if education %}
+<script>
+    const editEducationForm = document.querySelector('form[data-education-api]');
+
+    editEducationForm.addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        const form = event.currentTarget;
+        const submitButton = form.querySelector('button[type="submit"]');
+        const fields = new FormData(form);
+        const yearEnded = fields.get('year_ended');
+
+        const payload = {
+            institution: fields.get('institution'),
+            degree: fields.get('degree'),
+            description: fields.get('description'),
+            year_started: Number(fields.get('year_started')),
+            year_ended: yearEnded === '' ? null : Number(yearEnded),
+            is_current: fields.has('is_current'),
+        };
+
+        submitButton.disabled = true;
+        try {
+            const response = await fetch(form.dataset.educationApi, {
+                method: 'PATCH',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': fields.get('csrfmiddlewaretoken'),
+                },
+                body: JSON.stringify(payload),
+            });
+            const data = await response.json().catch(() => ({}));
+
+            if (!response.ok) {
+                const messages = Object.values(data).flat()
+                    .filter(value => typeof value === 'string');
+                throw new Error(
+                    messages.join(' ') || `Permintaan gagal (HTTP ${response.status}).`
+                );
+            }
+
+            for (const name of Object.keys(payload)) {
+                if (name !== 'is_current') {
+                    form.elements.namedItem(name).value = data[name] ?? '';
+                }
+            }
+
+            showToast('Berhasil', 'Data pendidikan berhasil diperbarui.', 'success');
+        } catch (error) {
+            showToast('Gagal memperbarui pendidikan', error.message, 'error');
+        } finally {
+            submitButton.disabled = false;
+        }
+    });
+</script>
+{% endif %}
 {% endblock content %}
