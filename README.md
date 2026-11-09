@@ -71,3 +71,34 @@ Pada template Django, nilai variabel secara default sudah melalui autoescaping s
 Pada bagiaJ Education saya, nilai teks dari JSON diproses menggunakan escapeHtml sebelum dimasukkan ke HTML. Untuk pesan error dan toast, saya menggunakan textContent agar isinya diperlakukan sebagai teks. Selain itu, input  institution, degree, dan description dibersihkan menggunakan strip_tags pada method clean_<field> di EducationForm. Saya memahami bahwa pembersihan di server ini tetap perlu disertai escaping saat  menampilkan data, karena strip_tags saja bukan jaminan bahwa su atu nilai aman untuk langsung dimasukkan ke HTML.
 
 AI disclosure : saya menggunakan chatgpt untuk dapat benar benar menjelaskan materi karena menurut saya materi minggu ini merupakan yang paling sulit sejauh ini dan sejujurnya saja kesulitan memahami sehingga harus di jelaskan dari awal banget dengan chatgpt dan saya membuat latihan di folder lain untuk berlatih materi ini sebelum dituangkan ke dalam folder ini 
+
+### TUGAS INDIVIDU 6 
+
+### Tugas 6
+
+1. REST adalah gaya arsitektur yang mengatur cara client dan server berkomunikasi lewat resource. Contohnya, /api/v1/education/1/ adalah alamat untuk satu data pendidikan. JSON cuma format datanya. REST juga mengatur cara mengakses data, misalnya GET untuk membaca, dan setiap request perlu membawa informasi yang dibutuhkan server untuk memprosesnya.
+
+   Di Education, saya bisa pakai PUT kalau ingin mengganti satu data pendidikan secara lengkap. Kalau yang mau saya ubah cuma deskripsi, saya pakai PATCH dan cukup kirim field description.
+
+2. Di Tugas 5, saya menyusun dictionary sendiri sebelum mengirim data lewat JsonResponse. Sekarang EducationSerializer membantu saya memilih field yang ditampilkan dan memeriksa input sebelum disimpan. Misalnya, aturan bahwa tahun selesai tidak boleh lebih kecil dari tahun masuk cukup saya tulis sekali di serializer, lalu bisa dipakai saat tambah maupun edit data.
+
+3. Autentikasi mengecek siapa yang mengirim request, sedangkan otorisasi mengecek apa yang boleh dilakukan akun itu. Di proyek saya, Editor bisa mengedit data Education, tetapi tidak bisa menghapusnya. Walaupun tombol Hapus disembunyikan, Editor masih bisa mencoba kirim DELETE langsung lewat Postman. Permission class di server yang menolak request itu dengan status 403.
+
+4. Browser bisa otomatis mengirim cookie sesi saat pengguna sudah login. Situs lain bisa mencoba memanfaatkan sesi itu untuk mengirim request perubahan data, jadi server tetap perlu memeriksa token CSRF. Awalnya bagian tes ini agak membingungkan buat saya karena force_authenticate() sudah membuat request punya pengguna. Ternyata cara itu melewati SessionAuthentication, termasuk pengecekan CSRF-nya. Karena itu, saya pakai APIClient(enforce_csrf_checks=True) dan .login() untuk mengecek bahwa request tanpa token ditolak dengan status 403.
+
+## AI disclosure
+
+Saya menggunakan AI Codex untuk membantu saya untuk memahami materi, menjelaskan dan memandu saya dalam mengerjakan karena saya kurang mengerti materi yang diajarkan karena untuk dapat mengerjakan saya perlu di jelaskan dengan mendalam dan benar benar diberi contoh.
+
+Yang dibantu Codex:
+- Menjelaskan konsep, termasuk kenapa tes CSRF perlu memakai `.login()` agar sesi dan token valid
+- Memberi petunjuk dan pertanyaan pemandu ketika saya buntu, tanpa langsung memberi jawaban jadi
+- Mengecek hasil pekerjaan saya terhadap checklist dan menunjukkan bagian yang masih kurang
+- Memberi masukan untuk merapikan bahasa draf refleksi ini
+
+Yang saya kerjakan sendiri:
+- perubahan kode dan konfigurasi di proyek
+- Penulisan dan pengujian tes
+- Semua commit
+- Isi dan gagasan utama refleksi ini
+
