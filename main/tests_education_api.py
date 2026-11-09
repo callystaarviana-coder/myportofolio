@@ -143,10 +143,22 @@ class EducationAPITest(APITestCase):
 
     def test_session_csrf_on_create_patch_and_delete(self):
         client = APIClient(enforce_csrf_checks=True)
-        client.force_login(self.owner)
-        self.assertEqual(client.post(self.list_url, self.payload, format="json").status_code, 403)
-        self.assertEqual(client.patch(self.detail_url, {"degree": "Updated"}, format="json").status_code, 403)
+        self.assertTrue(
+            client.login(username=self.owner.username, password="test-password")
+        )
+
+        response = client.post(self.list_url, self.payload, format="json")
+        self.assertEqual(response.status_code, 403)
+        self.assertIn("CSRF", str(response.data["detail"]))
+
+        response = client.patch(self.detail_url, {"degree": "Updated"}, format="json")
+        self.assertEqual(response.status_code, 403)
         self.assertEqual(client.delete(self.detail_url).status_code, 403)
+
+        self.assertEqual(Education.objects.count(), 1)
+        self.education.refresh_from_db()
+        self.assertEqual(self.education.degree, "S1 Sistem Informasi")
+    
         response = client.get(reverse("main:show_education"))
         self.assertEqual(response.status_code, 200)
         token = client.cookies["csrftoken"].value
